@@ -1,30 +1,33 @@
-import React, { useState } from "react";
-import Spinner from "./Spinner";
+import React from "react";
+import { Draggable } from "react-beautiful-dnd";
 
-const Card = ({ type, title, thumbnail }) => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isOverlayOpen, setIsOverlayOpen] = useState(false);
-
-  const handleImageLoad = () => {
-    setIsLoading(false);
-  };
-
-  const handleCardClick = () => {
-    setIsOverlayOpen(true);
-  };
-
-  const handleOverlayClose = () => {
-    setIsOverlayOpen(false);
-  };
+const Card = ({ card, onClick, onClose, draggable }) => {
+  const { type, title, position, thumbnail, isOverlayOpen } = card;
 
   return (
-    <div className="card" onClick={handleCardClick}>
-      {isLoading && <Spinner />} {/* Render the spinner if image is loading */}
-      <img src={thumbnail} alt={title} onLoad={handleImageLoad} />
-      {isOverlayOpen && (
-        <Overlay image={thumbnail} onClose={handleOverlayClose} />
+    <Draggable draggableId={type} index={position}>
+      {(provided) => (
+        <div
+          className="card"
+          onClick={onClick}
+          ref={provided.innerRef}
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+        >
+          {isOverlayOpen && (
+            <div className="overlay" onClick={(e) => e.stopPropagation()}>
+              <div className="overlay-content">
+                <img src={thumbnail} alt={title} />
+                <button className="close-button" onClick={onClose}>
+                  Close
+                </button>
+              </div>
+            </div>
+          )}
+          <img src={thumbnail} alt={title} />
+        </div>
       )}
-    </div>
+    </Draggable>
   );
 };
 
